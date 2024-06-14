@@ -349,6 +349,45 @@ m.facebook.com and youtube.com, although they had a significant traffic, they br
 In conclusion, the table primarily demonstrated the importance of marketing activities on digital platforms, including engaging content, advertising, email marketing, search engine optimisation to maximise revenue, conversions and user visits. 
 
 ### 4.4. Average number of pageviews by purchaser type (purchasers vs non-purchasers) in June, July 2017
+```
+with sub1 as(
+select 
+  format_date("%Y%m", parse_date ("%Y%m%d",date)) as month,
+  sum(totals.pageviews)/count(distinct fullVisitorId) as avg_pageviews_purchase
+from `bigquery-public-data.google_analytics_sample.ga_sessions_*`
+where _table_suffix between '20170601' and '20170731'
+and  totals.transactions >=1
+group by month
+order by month),
+
+sub2 as(
+select format_date("%Y%m", parse_date ("%Y%m%d",date)) as month,
+       sum(totals.pageviews)/count(distinct fullVisitorId) as avg_pageviews_non_purchase
+from `bigquery-public-data.google_analytics_sample.ga_sessions_*`
+where _table_suffix between '20170601' and '20170731'
+and  totals.transactions is null
+group by month
+order by month)
+
+select sub1.month, sub1.avg_pageviews_purchase, sub2. avg_pageviews_non_purchase
+from sub1
+inner join sub2
+on sub1.month=sub2.month
+order by month
+```
+| month  | avg_pageviews_purchase | avg_pageviews_non_purchase |
+|--------|------------------------|----------------------------|
+| 201706 | 25.73                  | 4.07                       |
+| 201707 | 27.72                  | 4.19                       |
+
+The table demonstrated behaviour of users who were purchaser and non-purchaser in 2 consecutive months (June and July, 2017). 
+
+#### Pageviews of purchaser and non-purchaser
+There was a significant difference in the number of pageviews that purchasers and non-purchasers had made. On average, users who made transactions tended to view around 25 pages, equals 6 times of this figure of non-purchasers (about 4 pages). 
+#### User engagement
+The higher average pageviews of purchasers suggested that the more engaged to website content, the more likely users made transactions. 
+#### User bahaviour
+The users who had intent to buy in advance, tended to spend more time in researching product information, browsing product reviews, details, or compared with other options before 
 ### 4.5. Average number of transactions per user that made a purchase in July 2017
 ### 4.6. Average amount of money spent per session. Only include purchaser data in July 2017
 ### 4.7. Other products purchased by customers who purchased product "YouTube Men's Vintage Henley" in July 2017
