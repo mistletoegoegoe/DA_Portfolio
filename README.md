@@ -392,12 +392,12 @@ The users who had intent to buy in advance, tended to spend more time in researc
 The website should be optimised to showcase the relevant information such as product details, reviews, other similar products, etc, in order to save time for users and enhance their experience. 
 ### 4.5. Average number of transactions per user that made a purchase in July 2017
 ```
-select 
+SELECT 
   format_date("%Y%m", parse_date ("%Y%m%d",date)) as month,
   sum(totals.transactions)/ count (distinct fullvisitorID) as Avg_total_transactions_per_user
-from `bigquery-public-data.google_analytics_sample.ga_sessions_201707*`
-where totals.transactions >=1
-group by month
+FROM `bigquery-public-data.google_analytics_sample.ga_sessions_201707*`
+WHERE totals.transactions >=1
+GROUP BY month
 ```
 | Month  | Avg_total_transactions_per_user |
 |--------|---------------------------------|
@@ -406,6 +406,151 @@ group by month
 The table shows the average total transactions per user in July. This data suggests that, during July 2017, the typical user conducted about 1.11 transactions on average. This could be useful for understanding user behavior, tracking user engagement with your platform, or evaluating the effectiveness of marketing campaigns or promotions during that specific month.
 
 ### 4.6. Average amount of money spent per session. Only include purchaser data in July 2017
+```
+
+SELECT 
+  FORMAT_DATE('%Y%m', PARSE_DATE('%Y%m%d', date)) AS month,
+  ROUND((SUM(product.productRevenue) / SUM(totals.visits))/1000000,2) AS Avg_revenue_by_user_per_visit
+FROM 
+  `bigquery-public-data.google_analytics_sample.ga_sessions_*`, 
+  UNNEST(hits) AS hits, 
+  UNNEST(hits.product) AS product
+WHERE 
+  _TABLE_SUFFIX BETWEEN '20170701' AND '20170731'
+  AND product.productRevenue IS NOT NULL
+  AND totals.transactions IS NOT NULL
+GROUP BY month;
+```
+| Month  | Avg_total_transactions_per_user |
+|--------|---------------------------------|
+| 201707 | 43.86                           |
+
+The average total transactions per user for July 2017 is 43.86. This suggests that, on average, each user conducted approximately 44 transactions during that month. This could be an important metric for businesses to measure user engagement and activity.
+
 ### 4.7. Other products purchased by customers who purchased product "YouTube Men's Vintage Henley" in July 2017
+```
+WITH CUSTOMER AS(
+SELECT DISTINCT fullVisitorId, product.productRevenue
+FROM
+  `bigquery-public-data.google_analytics_sample.ga_sessions_201707*`,
+  UNNEST (hits) hits,
+  UNNEST (hits.product) product 
+where v2ProductName="YouTube Men's Vintage Henley" 
+AND product.productRevenue is not null 
+),
+
+PRODUCT AS(
+SELECT fullVisitorId, v2ProductName, productQuantity, product.productRevenue
+FROM 
+  `bigquery-public-data.google_analytics_sample.ga_sessions_201707*`,
+  UNNEST (hits) hits,
+  UNNEST (hits.product) product
+WHERE product.productRevenue is not null 
+)
+
+SELECT 
+  PRODUCT.v2ProductName, 
+  SUM(PRODUCT.productQuantity) AS quantity
+FROM  CUSTOMER
+INNER JOIN  PRODUCT
+ON PRODUCT.fullVisitorId=CUSTOMER.fullVisitorId
+WHERE 
+  PRODUCT.v2ProductName NOT LIKE "YouTube Men's Vintage Henley" 
+AND 
+  product.productRevenue is not null 
+GROUP BY PRODUCT.v2ProductName
+ORDER BY SUM(PRODUCT.productQuantity) DESC
+```
+| other_purchased_products                                 | quantity |
+|----------------------------------------------------------|----------|
+| Google Sunglasses                                        | 20       |
+| Google Womens Vintage Hero Tee Black                     | 7        |
+| SPF-15 Slim & Slender Lip Balm                           | 6        |
+| Google Womens Short Sleeve Hero Tee Red Heather          | 4        |
+| YouTube Mens Fleece Hoodie Black                         | 3        |
+| Google Mens Short Sleeve Badge Tee Charcoal              | 3        |
+| YouTube Twill Cap                                        | 2        |
+| Red Shine 15 oz Mug                                      | 2        |
+| Google Doodle Decal                                      | 2        |
+| Recycled Mouse Pad                                       | 2        |
+| Google Mens Short Sleeve Hero Tee Charcoal               | 2        |
+| Android Womens Fleece Hoodie                             | 2        |
+| 22 oz YouTube Bottle Infuser                             | 2        |
+| Android Mens Vintage Henley                              | 2        |
+| Crunch Noise Dog Toy                                     | 2        |
+| Android Wool Heather Cap Heather/Black                   | 2        |
+| Google Mens Vintage Badge Tee Black                      | 1        |
+| Google Twill Cap                                         | 1        |
+| Google Mens Long & Lean Tee Grey                         | 1        |
+| Google Mens Long & Lean Tee Charcoal                     | 1        |
+| Google Laptop and Cell Phone Stickers                    | 1        |
+| Google Mens Bike Short Sleeve Tee Charcoal               | 1        |
+| Google 5-Panel Cap                                       | 1        |
+| Google Toddler Short Sleeve T-shirt Grey                 | 1        |
+| Android Sticker Sheet Ultra Removable                    | 1        |
+| YouTube Custom Decals                                    | 1        |
+| Four Color Retractable Pen                               | 1        |
+| Google Mens Long Sleeve Raglan Ocean Blue                | 1        |
+| Google Mens Vintage Badge Tee White                      | 1        |
+| Google Mens 100% Cotton Short Sleeve Hero Tee Red        | 1        |
+| Android Mens Vintage Tank                                | 1        |
+| Google Mens Performance Full Zip Jacket Black            | 1        |
+| 26 oz Double Wall Insulated Bottle                       | 1        |
+| Google Mens Zip Hoodie                                   | 1        |
+| YouTube Womens Short Sleeve Hero Tee Charcoal            | 1        |
+| Google Mens Pullover Hoodie Grey                         | 1        |
+| YouTube Mens Short Sleeve Hero Tee White                 | 1        |
+| Android Mens Short Sleeve Hero Tee White                 | 1        |
+| Android Mens Pep Rally Short Sleeve Tee Navy             | 1        |
+| YouTube Mens Short Sleeve Hero Tee Black                 | 1        |
+| Google Slim Utility Travel Bag                           | 1        |
+| Android BTTF Moonshot Graphic Tee                        | 1        |
+| Google Mens Airflow 1/4 Zip Pullover Black               | 1        |
+| Google Womens Long Sleeve Tee Lavender                   | 1        |
+| 8 pc Android Sticker Sheet                               | 1        |
+| YouTube Hard Cover Journal                               | 1        |
+| Android Mens Short Sleeve Hero Tee Heather               | 1        |
+| YouTube Womens Short Sleeve Tri-blend Badge Tee Charcoal | 1        |
+| Google Mens Performance 1/4 Zip Pullover Heather/Black   | 1        |
+| YouTube Mens Long & Lean Tee Charcoal                    | 1        |
+
+Overall, the data provides valuable insights into customer preferences, product popularity, and potential areas for marketing and merchandising strategies. Further analysis of historical data and integration with customer demographics could provide a more comprehensive understanding of these trends.
 ### 4.8. Calculate cohort map from product view to addtocart to purchase in Jan, Feb and March 2017.
+```
+with product_data as(
+select
+    format_date('%Y%m', parse_date('%Y%m%d',date)) as month,
+    count(CASE WHEN eCommerceAction.action_type = '2' THEN product.v2ProductName END) as num_product_view,
+    count(CASE WHEN eCommerceAction.action_type = '3' THEN product.v2ProductName END) as num_add_to_cart,
+    count(CASE WHEN eCommerceAction.action_type = '6' THEN product.v2ProductName END) as num_purchase
+FROM `bigquery-public-data.google_analytics_sample.ga_sessions_*`
+,UNNEST(hits) as hits
+,UNNEST (hits.product) as product
+where _table_suffix between '20170101' and '20170331'
+and eCommerceAction.action_type in ('2','3','6')
+group by month
+order by month
+)
+
+select
+    *,
+    round(num_add_to_cart/num_product_view * 100, 2) as add_to_cart_rate,
+    round(num_purchase/num_product_view * 100, 2) as purchase_rate
+from product_data
+```
+| month  | num_product_view | num_add_to_cart | num_purchase | add_to_cart_rate | purchase_rate |
+|--------|------------------|-----------------|--------------|------------------|---------------|
+| 201701 | 25787            | 7342            | 4328         | 28.47            | 16.78         |
+| 201702 | 21489            | 7360            | 4141         | 34.25            | 19.27         |
+| 201703 | 23549            | 8782            | 6018         | 37.29            | 25.56         |
+
+Overall, the number of product views from January 2017 to March 2017 increased gradually. The add-to-cart rate and purchase rate also increased over the same period, indicating improved user engagement and conversion.
+
+However, the add-to-cart rate and purchase rate are notably higher in March 2017, suggesting potential improvements in the website's user experience or marketing efforts.
+
+## 5. Gains from the project
+- Conducted this project was a huge opportunity to learn about marketing industry, especially customers' behaviour on digital platforms. That could be gained by analysing metrics such as bounce rate, revenue, transactions per visit, etc. 
+- Gained insights about marketing channels, how those channels drove traffic and pull customers, and the contribution of sources in total revenue.
+- Put foward some recommendations to improved website content and enhance user experience. 
+
 
