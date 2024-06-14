@@ -391,6 +391,19 @@ The users who had intent to buy in advance, tended to spend more time in researc
 #### Recommendations
 The website should be optimised to showcase the relevant information such as product details, reviews, other similar products, etc, in order to save time for users and enhance their experience. 
 ### 4.5. Average number of transactions per user that made a purchase in July 2017
+```
+select 
+  format_date("%Y%m", parse_date ("%Y%m%d",date)) as month,
+  sum(totals.transactions)/ count (distinct fullvisitorID) as Avg_total_transactions_per_user
+from `bigquery-public-data.google_analytics_sample.ga_sessions_201707*`
+where totals.transactions >=1
+group by month
+```
+| Month  | Avg_total_transactions_per_user |
+|--------|---------------------------------|
+| 201707 | 1.11                            |
+
+The table shows the average total transactions per user in July. This data suggests that, during July 2017, the typical user conducted about 1.11 transactions on average. This could be useful for understanding user behavior, tracking user engagement with your platform, or evaluating the effectiveness of marketing campaigns or promotions during that specific month.
 
 ### 4.6. Average amount of money spent per session. Only include purchaser data in July 2017
 ### 4.7. Other products purchased by customers who purchased product "YouTube Men's Vintage Henley" in July 2017
