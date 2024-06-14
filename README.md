@@ -387,8 +387,11 @@ There was a significant difference in the number of pageviews that purchasers an
 #### User engagement
 The higher average pageviews of purchasers suggested that the more engaged to website content, the more likely users made transactions. 
 #### User bahaviour
-The users who had intent to buy in advance, tended to spend more time in researching product information, browsing product reviews, details, or compared with other options before 
+The users who had intent to buy in advance, tended to spend more time in researching product information, browsing product reviews, details, or compared with other options before making payment. That led to the higher number of pageviews. 
+#### Recommendations
+The website should be optimised to showcase the relevant information such as product details, reviews, other similar products, etc, in order to save time for users and enhance their experience. 
 ### 4.5. Average number of transactions per user that made a purchase in July 2017
+
 ### 4.6. Average amount of money spent per session. Only include purchaser data in July 2017
 ### 4.7. Other products purchased by customers who purchased product "YouTube Men's Vintage Henley" in July 2017
 ### 4.8. Calculate cohort map from product view to addtocart to purchase in Jan, Feb and March 2017.
